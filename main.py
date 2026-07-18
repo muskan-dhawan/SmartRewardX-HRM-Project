@@ -921,34 +921,14 @@ def main() -> None:
             .block-container { padding: 0 !important; max-width: 100% !important; }
             header[data-testid="stHeader"] { display: none !important; }
             
-            /* Floating Logout Button */
+            /* Hide the native Streamlit button so Javascript can click it silently */
             div[data-testid="stButton"] {
-                position: fixed;
-                bottom: 40px;
-                right: 48px;
-                z-index: 9999999;
-            }
-            div[data-testid="stButton"] button {
-                background: rgba(251,113,133,0.12) !important;
-                border: 1px solid rgba(251,113,133,0.4) !important;
-                color: #fb7185 !important;
-                padding: 10px 24px !important;
-                border-radius: 12px !important;
-                font-weight: 600 !important;
-                transition: all 0.2s ease !important;
-                font-family: 'Plus Jakarta Sans', sans-serif !important;
-            }
-            div[data-testid="stButton"] button:hover {
-                background: rgba(251,113,133,0.25) !important;
-                border-color: #fb7185 !important;
-                color: #fff !important;
-                transform: translateY(-2px) !important;
-                box-shadow: 0 10px 20px rgba(251,113,133,0.2) !important;
+                display: none !important;
             }
             </style>
             """, unsafe_allow_html=True
         )
-        if st.button("Log out securely"):
+        if st.button("Trigger_Logout"):
             logout()
         show_employee_dashboard(user)
     else:

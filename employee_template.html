@@ -679,7 +679,9 @@
           </tbody>
         </table>
         <div style="margin-top:24px;">
-          <p class="card-sub" style="color:var(--coral);">To securely sign out of your account, please click the <strong>Log out securely</strong> button in the top right corner of your screen.</p>
+          <button class="nav-btn" onclick="triggerStreamlitLogout()" style="background:rgba(251,113,133,0.1); border-color:rgba(251,113,133,0.3); color:var(--coral); width:auto; padding:10px 20px; font-weight: 600; border-radius: 8px;">
+            Log out securely
+          </button>
         </div>
       </section>
     </div> <!-- end tab-settings -->
@@ -688,6 +690,21 @@
 </div>
 
 <script>
+  function triggerStreamlitLogout() {
+    try {
+      const buttons = window.parent.document.querySelectorAll('button');
+      for (let btn of buttons) {
+        if (btn.innerText.includes('Trigger_Logout')) {
+          btn.click();
+          return;
+        }
+      }
+      alert("Error: Logout bridge not found.");
+    } catch (e) {
+      alert("Logout failed: Browser security blocking Streamlit bridge. " + e.message);
+    }
+  }
+
   function switchTab(tabId, btn) {
     document.querySelectorAll('.tab-content').forEach(el => el.style.display = 'none');
     document.getElementById(tabId).style.display = 'block';

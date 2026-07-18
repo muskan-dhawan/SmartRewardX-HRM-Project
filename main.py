@@ -518,8 +518,15 @@ def show_signup_page() -> None:
 
 
 def render_sidebar(user: dict[str, object]) -> None:
-    st.sidebar.title("SmartRewardX")
-    st.sidebar.write(user["full_name"])
+    st.sidebar.markdown(
+        """
+        <div style="font-family: 'Fraunces', serif; font-weight: 700; font-size: 26px; letter-spacing: -0.01em; margin-bottom: 8px; line-height: 1.1;">
+            SmartReward<span style="color:#FFC857; font-style:italic; font-weight:600;">X</span>
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
+    st.sidebar.write(f"**{user['full_name']}**")
     st.sidebar.caption(f"{str(user['role']).title()} | {user['email']}")
     st.sidebar.divider()
 
@@ -639,7 +646,18 @@ def employee_dashboard(df: pd.DataFrame, user: dict[str, object]) -> None:
 
 
 def managerial_view(df: pd.DataFrame, cluster_summary: pd.DataFrame) -> None:
-    st.title("Managerial View")
+    st.markdown(
+        """
+        <div style="margin-top: -1.5rem; padding-bottom: 2rem;">
+            <div style="font-size: 11.5px; letter-spacing: .16em; text-transform: uppercase; color: #2DD4BF; font-weight: 700; margin-bottom: 8px;">
+                Reward Engine · Admin
+            </div>
+            <h1 style="font-family: 'Fraunces', serif; font-weight: 600; font-size: 36px; margin:0; line-height: 1.2; text-align: left; background: none; -webkit-text-fill-color: #F3F0FA;">
+                Executive <em style="color:#FFC857; font-style:italic;">Overview</em>.
+            </h1>
+        </div>
+        """, unsafe_allow_html=True
+    )
 
     average_score = df["total_score"].mean()
     gold_count = (df["badge_earned"] == "Gold Performance Badge").sum()
@@ -906,7 +924,7 @@ def main() -> None:
             /* Floating Logout Button */
             div[data-testid="stButton"] {
                 position: fixed;
-                top: 35px;
+                bottom: 40px;
                 right: 48px;
                 z-index: 9999999;
             }

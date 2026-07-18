@@ -214,6 +214,24 @@ def apply_theme() -> None:
             box-shadow: 0 8px 20px rgba(59, 130, 246, 0.4);
             color: white;
         }
+        
+        div[data-testid="stForm"] {
+            background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 24px;
+            padding: 2.5rem;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            max-width: 450px;
+            margin: 0 auto;
+        }
+        
+        div[data-testid="stTextInput"] input, div[data-testid="stSelectbox"] div {
+            background: rgba(255, 255, 255, 0.05) !important;
+            border: 1px solid rgba(255, 255, 255, 0.1) !important;
+            color: #f8fafc !important;
+            border-radius: 12px;
+        }
 
         /* Scrollbar */
         ::-webkit-scrollbar {
@@ -343,154 +361,155 @@ def close_auth_header() -> None:
 def show_login_page() -> None:
     show_auth_header("Secure login for managers and employees")
 
-    with st.container(border=True):
-        st.subheader("Login")
+    st.markdown('<div style="max-width: 450px; margin: 0 auto;">', unsafe_allow_html=True)
+    show_password = st.toggle("Show password", key="login_show_pwd")
+    st.markdown('</div>', unsafe_allow_html=True)
+    
+    with st.form("login_form", border=False):
+        st.markdown('<h3 style="text-align:center; margin-bottom: 1.5rem;">Sign In</h3>', unsafe_allow_html=True)
         
-        show_password = st.toggle("Show password", key="login_show_pwd")
-        
-        with st.form("login_form", border=False):
-            email = st.text_input(
-                "Email",
-                value=st.session_state.pop("prefill_email", ""),
-                placeholder="name@company.com",
-            )
-            password = st.text_input(
-                "Password",
-                type="default" if show_password else "password",
-                placeholder="Enter password",
-            )
+        email = st.text_input(
+            "Email",
+            value=st.session_state.pop("prefill_email", ""),
+            placeholder="name@company.com",
+        )
+        password = st.text_input(
+            "Password",
+            type="default" if show_password else "password",
+            placeholder="Enter password",
+        )
 
-            submitted = st.form_submit_button("Sign in", type="primary", use_container_width=True)
+        submitted = st.form_submit_button("Sign in", type="primary", use_container_width=True)
 
-            if submitted:
-                email_ok = is_valid_email(email)
-                password_ok = bool(password)
-                login_ready = email_ok and password_ok
+        if submitted:
+            email_ok = is_valid_email(email)
+            password_ok = bool(password)
+            login_ready = email_ok and password_ok
 
-                if not login_ready:
-                    if not email_ok:
-                        st.error("Use a valid company email format.")
-                    if not password_ok:
-                        st.error("Password is required.")
+            if not login_ready:
+                if not email_ok:
+                    st.error("Use a valid company email format.")
+                if not password_ok:
+                    st.error("Password is required.")
+            else:
+                with st.spinner("Signing in..."):
+                    user = authenticate_user(email, password)
+                    time.sleep(0.35)
+
+                if not user:
+                    st.toast("Login failed. Check your email and password.")
+                    st.error("Invalid email or password.")
                 else:
-                    with st.spinner("Signing in..."):
-                        user = authenticate_user(email, password)
-                        time.sleep(0.35)
+                    start_session(user)
+                    route = (
+                        MANAGER_DASHBOARD_ROUTE
+                        if user["role"] == "manager"
+                        else EMPLOYEE_DASHBOARD_ROUTE
+                    )
+                    queue_toast("Login successful.")
+                    set_route(route)
 
-                    if not user:
-                        st.toast("Login failed. Check your email and password.")
-                        st.error("Invalid email or password.")
-                    else:
-                        start_session(user)
-                        route = (
-                            MANAGER_DASHBOARD_ROUTE
-                            if user["role"] == "manager"
-                            else EMPLOYEE_DASHBOARD_ROUTE
-                        )
-                        queue_toast("Login successful.")
-                        set_route(route)
+    st.divider()
+    if st.button("New employee sign up", use_container_width=True):
+        set_route(SIGNUP_ROUTE)
 
-        st.divider()
-        if st.button("New employee sign up", use_container_width=True):
-            set_route(SIGNUP_ROUTE)
-
-        with st.expander("Demo accounts"):
-            st.write("Manager: manager@company.com / Manager@123")
-            st.write("Employee: aarav.sharma@company.com / Employee@123")
-
+    with st.expander("Demo accounts"):
+        st.write("Manager: manager@company.com / Manager@123")
+        st.write("Employee: aarav.sharma@company.com / Employee@123")
+        
     close_auth_header()
 
 
 def show_signup_page() -> None:
     show_auth_header("New employee account setup")
 
-    with st.container(border=True):
-        st.subheader("Employee Sign-Up")
+    st.markdown('<div style="max-width: 450px; margin: 0 auto;">', unsafe_allow_html=True)
+    show_password = st.toggle("Show password", key="signup_show_pwd")
+    st.markdown('</div>', unsafe_allow_html=True)
+    
+    with st.form("signup_form", border=False):
+        st.markdown('<h3 style="text-align:center; margin-bottom: 1.5rem;">Create Account</h3>', unsafe_allow_html=True)
+        full_name = st.text_input("Full Name", placeholder="Aditi Sharma")
+        employee_id = st.text_input("Employee ID", placeholder="EMP031")
+        email = st.text_input("Email", placeholder="employee@company.com")
+        department = st.selectbox(
+            "Department",
+            [
+                "Select department",
+                "Engineering",
+                "Sales",
+                "HR",
+                "Operations",
+                "Finance",
+                "Marketing",
+                "Customer Success",
+            ],
+        )
         
-        show_password = st.toggle("Show password", key="signup_show_pwd")
-        
-        with st.form("signup_form", border=False):
-            full_name = st.text_input("Full Name", placeholder="Aditi Sharma")
-            employee_id = st.text_input("Employee ID", placeholder="EMP031")
-            email = st.text_input("Email", placeholder="employee@company.com")
-            department = st.selectbox(
-                "Department",
-                [
-                    "Select department",
-                    "Engineering",
-                    "Sales",
-                    "HR",
-                    "Operations",
-                    "Finance",
-                    "Marketing",
-                    "Customer Success",
-                ],
+        pwd_type = "default" if show_password else "password"
+        password = st.text_input("Password", type=pwd_type, placeholder="Minimum 8 characters")
+        confirm_password = st.text_input("Confirm Password", type=pwd_type, placeholder="Re-enter password")
+
+        submitted = st.form_submit_button("Create employee account", type="primary", use_container_width=True)
+
+        if submitted:
+            password_issues = validate_password_strength(password) if password else []
+            full_name_ok = len(full_name.strip()) >= 2
+            employee_id_ok = is_valid_employee_id(employee_id)
+            email_ok = is_valid_email(email)
+            department_ok = department != "Select department"
+            password_ok = bool(password) and not password_issues
+            passwords_match = password == confirm_password
+
+            signup_ready = (
+                full_name_ok
+                and employee_id_ok
+                and email_ok
+                and department_ok
+                and password_ok
+                and passwords_match
             )
-            
-            pwd_type = "default" if show_password else "password"
-            password = st.text_input("Password", type=pwd_type, placeholder="Minimum 8 characters")
-            confirm_password = st.text_input("Confirm Password", type=pwd_type, placeholder="Re-enter password")
 
-            submitted = st.form_submit_button("Create employee account", type="primary", use_container_width=True)
+            if not signup_ready:
+                if not full_name_ok:
+                    st.error("Full name must be at least 2 characters.")
+                if not employee_id_ok:
+                    st.error("Employee ID must be 3-20 letters, numbers, or hyphens.")
+                if not email_ok:
+                    st.error("Use a valid email address.")
+                if not department_ok:
+                    st.error("Please select a department.")
+                if password_issues:
+                    st.error("Password needs " + ", ".join(password_issues) + ".")
+                elif not password_ok:
+                    st.error("Password is required.")
+                if not passwords_match:
+                    st.error("Passwords do not match.")
+            else:
+                with st.spinner("Creating secure account..."):
+                    ok, message, _ = create_employee_user(
+                        full_name=full_name,
+                        employee_id=employee_id,
+                        email=email,
+                        department=department,
+                        password=password,
+                    )
+                    time.sleep(0.35)
 
-            if submitted:
-                password_issues = validate_password_strength(password) if password else []
-                full_name_ok = len(full_name.strip()) >= 2
-                employee_id_ok = is_valid_employee_id(employee_id)
-                email_ok = is_valid_email(email)
-                department_ok = department != "Select department"
-                password_ok = bool(password) and not password_issues
-                passwords_match = password == confirm_password
-
-                signup_ready = (
-                    full_name_ok
-                    and employee_id_ok
-                    and email_ok
-                    and department_ok
-                    and password_ok
-                    and passwords_match
-                )
-
-                if not signup_ready:
-                    if not full_name_ok:
-                        st.error("Full name must be at least 2 characters.")
-                    if not employee_id_ok:
-                        st.error("Employee ID must be 3-20 letters, numbers, or hyphens.")
-                    if not email_ok:
-                        st.error("Use a valid email address.")
-                    if not department_ok:
-                        st.error("Please select a department.")
-                    if password_issues:
-                        st.error("Password needs " + ", ".join(password_issues) + ".")
-                    elif not password_ok:
-                        st.error("Password is required.")
-                    if not passwords_match:
-                        st.error("Passwords do not match.")
+                if ok:
+                    st.session_state["prefill_email"] = email
+                    queue_toast(message)
+                    set_route(LOGIN_ROUTE)
                 else:
-                    with st.spinner("Creating secure account..."):
-                        ok, message, _ = create_employee_user(
-                            full_name=full_name,
-                            employee_id=employee_id,
-                            email=email,
-                            department=department,
-                            password=password,
-                        )
-                        time.sleep(0.35)
+                    st.toast(message)
+                    st.error(message)
 
-                    if ok:
-                        st.session_state["prefill_email"] = email
-                        queue_toast(message)
-                        set_route(LOGIN_ROUTE)
-                    else:
-                        st.toast(message)
-                        st.error(message)
+    st.divider()
+    if st.button("Already have an account? Back to login", use_container_width=True):
+        set_route(LOGIN_ROUTE)
 
-        st.divider()
-        if st.button("Already have an account? Back to login", use_container_width=True):
-            set_route(LOGIN_ROUTE)
-
-        st.caption("Manager accounts are admin-created only and cannot be made here.")
-
+    st.caption("Manager accounts are admin-created only and cannot be made here.")
+    
     close_auth_header()
 
 

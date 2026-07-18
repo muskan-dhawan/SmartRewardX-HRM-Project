@@ -419,7 +419,7 @@ def show_login_page() -> None:
 
     with st.expander("Demo accounts"):
         st.write("Manager: manager@company.com / Manager@123")
-        st.write("Employee: aarav.sharma@company.com / Employee@123")
+        st.write("Employee: aarav.sharma@gmail.com / Employee@123")
         
     close_auth_header()
 

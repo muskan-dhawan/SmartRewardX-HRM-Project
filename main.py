@@ -49,12 +49,16 @@ def apply_theme() -> None:
     st.markdown(
         """
         <style>
-        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
         
         html, body, [data-testid="stAppViewContainer"] {
-            font-family: 'Outfit', sans-serif;
-            background: radial-gradient(circle at 15% 50%, #0f172a, #020617 100%);
-            color: #f8fafc;
+            font-family: 'Plus Jakarta Sans', sans-serif !important;
+            background: 
+              radial-gradient(ellipse 700px 500px at 8% 8%, rgba(45,212,191,0.16), transparent 60%),
+              radial-gradient(ellipse 600px 500px at 95% 12%, rgba(167,139,250,0.18), transparent 60%),
+              radial-gradient(ellipse 700px 600px at 50% 100%, rgba(251,113,133,0.13), transparent 60%),
+              linear-gradient(180deg, #161226, #1E1934 40%, #241D3D) !important;
+            color: #f8fafc !important;
         }
 
         header[data-testid="stHeader"] {
@@ -621,6 +625,7 @@ def employee_dashboard(df: pd.DataFrame, user: dict[str, object]) -> None:
         "{total_score}": f"{employee.get('total_score', 0):.1f}",
         "{fairness_note}": str(employee.get("fairness_note", "")),
         "{cluster_average_score}": f"{employee.get('cluster_average_score', 0):.2f}",
+        "{fairness_group}": str(employee.get("fairness_group", "Team")),
         "{diff_class}": diff_class,
         "{anomaly_icon}": anomaly_icon,
         "{anomaly_text}": anomaly_text,
@@ -859,6 +864,11 @@ def main() -> None:
 
     route = get_route()
     user = get_current_user()
+    
+    if route == "logout":
+        logout()
+        return
+        
     protect_route(route, user)
 
     if route == LOGIN_ROUTE:

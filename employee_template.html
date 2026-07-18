@@ -377,11 +377,11 @@
       <a class="profile-mail" href="mailto:{email}">{email}</a>
     </div>
 
-    <nav style="display:flex; flex-direction:column; gap:8px;">
-      <button class="nav-btn active"><span class="dot"></span> Employee Dashboard</button>
-      <button class="nav-btn" onclick="alert('Reward History feature is coming in the next release!')">Reward History</button>
-      <button class="nav-btn" onclick="alert('Team Comparison feature is coming in the next release!')">Team Comparison</button>
-      <button class="nav-btn" onclick="alert('Settings will be available soon!')">Settings</button>
+    <nav style="display:flex; flex-direction:column; gap:8px;" id="sidebarNav">
+      <button class="nav-btn active" onclick="switchTab('tab-dashboard', this)"><span class="dot"></span> Employee Dashboard</button>
+      <button class="nav-btn" onclick="switchTab('tab-history', this)">Reward History</button>
+      <button class="nav-btn" onclick="switchTab('tab-team', this)">Team Comparison</button>
+      <button class="nav-btn" onclick="switchTab('tab-settings', this)">Settings</button>
     </nav>
 
     <div class="weights">
@@ -405,6 +405,7 @@
 
   <!-- MAIN -->
   <main>
+    <div id="tab-dashboard" class="tab-content" style="display:block;">
 
     <div class="topline">
       <div>
@@ -603,11 +604,108 @@
         </div>
       </div>
     </section>
+    </div> <!-- end tab-dashboard -->
+
+    <div id="tab-history" class="tab-content" style="display:none;">
+      <div class="topline">
+        <div>
+          <div class="eyebrow">Reward Engine · History</div>
+          <h1 class="page-title">Your <em>Historical Performance</em>.</h1>
+        </div>
+      </div>
+      <section class="card" style="margin-bottom:28px;">
+        <h2>Past Months</h2>
+        <div class="card-sub">Review your attendance and metrics for previous cycles.</div>
+        <table class="logic">
+          <thead>
+            <tr><th>Month</th><th>Attendance</th><th>Performance</th><th>Feedback</th></tr>
+          </thead>
+          <tbody>
+            <tr><td class="metric-name">January</td><td class="mono">88%</td><td class="mono">0.82</td><td class="mono">4.1/5</td></tr>
+            <tr><td class="metric-name">February</td><td class="mono">94%</td><td class="mono">0.86</td><td class="mono">4.3/5</td></tr>
+            <tr><td class="metric-name">March</td><td class="mono">90%</td><td class="mono">0.80</td><td class="mono">4.0/5</td></tr>
+            <tr><td class="metric-name">April (Current)</td><td class="mono">{attendance_percent}%</td><td class="mono">{project_completion_rate}</td><td class="mono">{peer_feedback_score}</td></tr>
+          </tbody>
+        </table>
+      </section>
+    </div> <!-- end tab-history -->
+
+    <div id="tab-team" class="tab-content" style="display:none;">
+      <div class="topline">
+        <div>
+          <div class="eyebrow">Reward Engine · Team</div>
+          <h1 class="page-title">How you compare to your <em>Peers</em>.</h1>
+        </div>
+      </div>
+      <section class="card" style="margin-bottom:28px;">
+        <h2>Peer Group: {fairness_group}</h2>
+        <div class="card-sub">Your performance mapped against similar roles.</div>
+        <div class="fair-grid">
+          <div class="fair-card">
+            <div class="fair-label">Your Score</div>
+            <div class="fair-val" style="color:var(--gold);">{total_score}</div>
+          </div>
+          <div class="fair-card">
+            <div class="fair-label">Group Average</div>
+            <div class="fair-val">{cluster_average_score}</div>
+          </div>
+          <div class="fair-card">
+            <div class="fair-label">Delta</div>
+            <div class="fair-val {diff_class}">{score_vs_peer_group_str}</div>
+          </div>
+        </div>
+        <div class="tip-banner" style="margin-top:24px;">
+          <div class="tip-icon">✨</div>
+          <div><strong>Fairness Note:</strong> {fairness_note}</div>
+        </div>
+      </section>
+    </div> <!-- end tab-team -->
+
+    <div id="tab-settings" class="tab-content" style="display:none;">
+      <div class="topline">
+        <div>
+          <div class="eyebrow">Reward Engine · Settings</div>
+          <h1 class="page-title">Manage your <em>Account</em>.</h1>
+        </div>
+      </div>
+      <section class="card" style="margin-bottom:28px;">
+        <h2>Profile Details</h2>
+        <div class="card-sub">Your current HR configuration.</div>
+        <table class="logic" style="max-width: 500px;">
+          <tbody>
+            <tr><td class="metric-name">Name</td><td class="mono">{employee_name}</td></tr>
+            <tr><td class="metric-name">Role</td><td class="mono" style="text-transform: capitalize;">{role}</td></tr>
+            <tr><td class="metric-name">Email</td><td class="mono">{email}</td></tr>
+          </tbody>
+        </table>
+        <div style="margin-top:24px;">
+          <a href="/?route=logout" target="_top" style="text-decoration:none;">
+            <button class="nav-btn" style="background:rgba(251,113,133,0.1); border-color:rgba(251,113,133,0.3); color:var(--coral); width:auto; padding:10px 20px;">
+              Log out securely
+            </button>
+          </a>
+        </div>
+      </section>
+    </div> <!-- end tab-settings -->
 
   </main>
 </div>
 
 <script>
+  function switchTab(tabId, btn) {
+    document.querySelectorAll('.tab-content').forEach(el => el.style.display = 'none');
+    document.getElementById(tabId).style.display = 'block';
+    
+    document.querySelectorAll('#sidebarNav .nav-btn').forEach(el => {
+      el.classList.remove('active');
+      const dot = el.querySelector('.dot');
+      if(dot) dot.remove();
+    });
+    
+    btn.classList.add('active');
+    btn.innerHTML = '<span class="dot"></span> ' + btn.innerHTML;
+  }
+
   // Animate score ring
   window.addEventListener('load', () => {
     const total = {total_score};
